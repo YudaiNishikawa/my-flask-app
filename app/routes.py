@@ -1,0 +1,6 @@
+from app import app
+
+@app.route('/') # トップページ（/）にアクセスしたら...
+@app.route('/index') # /index にアクセスしても...
+def index():
+    return "Hello, World!" # この文字を画面に出して！
