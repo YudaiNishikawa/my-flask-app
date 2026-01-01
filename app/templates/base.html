@@ -9,9 +9,20 @@
     </head>
     <body>
         <div>
-            Microblog: <a href="/index">ホーム</a>
+            Microblog:
+            <a href="{{ url_for('index') }}">ホーム</a>
+            <a href="{{ url_for('login') }}">ログイン</a>
         </div>
         <hr>
+        {% with messages=get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
         {#ここに各ページの中身が流し込まれます#}
         {% block content %}{% endblock %}
     </body>
