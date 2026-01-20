@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>登録ユーザー一覧</h1>
+    <ul>
+    {% for user in users %}
+        <li>ID: {{user.id}}- <strong>{{user.username}}</strong>({{user.email}})</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
