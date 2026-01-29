@@ -8,6 +8,14 @@
         </tr>
     </table>
     <hr>
+    {% if user != current_user %} {# 自分をフォローしないように #}
+        {% if not current_user.is_following(user) %}
+            <p><a href="{{ url_for('follow', username=user.username)}}">フォローする</a></p>
+        
+        {% else %}
+            <a href="{{ url_for('unfollow', username=user.username) }}">フォロー解除</a>
+        {% endif %}
+    {% endif %}
     {% for post in posts %}
         <p>
             {{ post.author.username }}さんの投稿: <b>{{ post.body }}</b>

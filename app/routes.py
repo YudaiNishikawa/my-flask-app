@@ -7,25 +7,12 @@ from urllib.parse import urlparse
 from app import db
 from datetime import datetime,timezone
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    user = current_user
-    posts = [
-        {
-            "author": {"username": "ジョン"},
-            "body": "今日は天気がいいね！"
-        },
-        {
-            "author": {"username": "スーザン"},
-            "body": "アベンジャーズの映画、最高だった！"
-        },
-        {
-            "author": {"username": "yudai"},
-            "body": "pythonの勉強中！"
-        }
-    ]
+    user=current_user
+    posts = current_user.followed_posts().all()
     # ↓ この return の「位置（左側の空白の数）」が上の user= と同じことが重要です！
     return render_template('index.html', title='ホーム', user=user, posts=posts)
 
@@ -85,6 +72,7 @@ def secret():
 @app.route("/user/<username>")
 @login_required
 def user(username):
+    user=current_user
     user=User.query.filter_by(username=username).first_or_404()
     posts=[
         {"author":user,"body":"テスト投稿 #1"},
@@ -112,3 +100,26 @@ def before_request():
     if current_user.is_authenticated:
         current_user.last_seen=datetime.now(timezone.utc)
         db.session.commit()
+
+@app.route("/follow/<username>")
+@login_required
+def follow(username):
+    user=User.query.filter_by(username=username).first()
+    if user is None:
+        return redirect(url_for("index"))
+    if user==current_user:
+        return redirect(url_for("index"))
+    current_user.follow(user)
+    db.session.commit()
+    return redirect(url_for("user",username=username))
+
+@app.route("/unfollow/<username>")
+@login_required
+def unfollow(username):
+    user=User.query.filter_by(username=username).first()
+    current_user.unfollow(user)
+    db.session.commit()
+    return redirect(url_for("user",username=username))
+
+#Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+#venv\Scripts\activate
