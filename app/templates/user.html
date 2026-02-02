@@ -21,6 +21,17 @@
             {{ post.author.username }}さんの投稿: <b>{{ post.body }}</b>
         </p>
     {% endfor %}
+    <h1>ユーザー：{{ user.username  }}</h1>
+    {% if user.about_me %}<P>{{ user.about_me }}</P>{% endif %}
+    {% if user.last_seen %}<P>最終ログイン:{{ user.last_seen }}</P>{% endif %}
+
+    {% if user == current_user %}
+    <p><a href="{{ url_for('edit_profile') }}">プロフィールを編集する</a></p>
+    {% endif %}
+    <hr>
+    {% for post in posts %}
+        {% include '_post.html' %}
+    {% endfor %}
 {% endblock %}
     
     

@@ -30,6 +30,8 @@ class User(UserMixin,db.Model):
         backref=db.backref("followers",lazy="dynamic"),lazy="dynamic")
     password_hash=db.Column(db.String(128))
     posts=db.relationship("Post",backref="author",lazy="dynamic")
+    about_me=db.Column(db.String(140))
+    last_seen=db.Column(db.DateTime,default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return "<User {}>".format(self.username)
@@ -57,14 +59,13 @@ class User(UserMixin,db.Model):
             followers.c.followed_id==user.id).count()>0
     
     def followed_posts(self):
-        return Post.query.join(
+        followed = Post.query.join(
         followers, (followers.c.followed_id == Post.user_id)).filter(
-            followers.c.follower_id == self.id).order_by(
-                Post.timestamp.desc())
-        
+            followers.c.follower_id == self.id)
+        own = Post.query.filter_by(user_id=self.id)
+    # unionを使って「フォロー中」と「自分」を合体させる
+        return followed.union(own).order_by(Post.timestamp.desc())
     
-    about_me=db.Column(db.String(140))
-    last_seen=db.Column(db.DateTime,default=lambda: datetime.now(timezone.utc))
     
 @login.user_loader
 def load_user(id):

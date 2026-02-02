@@ -1,7 +1,7 @@
 from flask import render_template,flash,redirect,url_for,request
 from app import app
 from app.forms import LoginForm,RegistrationForm,EditProfileForm
-from app.models import User
+from app.models import User,Post
 from flask_login import current_user,login_user,logout_user,login_required
 from urllib.parse import urlparse
 from app import db
@@ -12,9 +12,16 @@ from datetime import datetime,timezone
 @login_required
 def index():
     user=current_user
-    posts = current_user.followed_posts().all()
+    page=request.args.get("page",1,type=int)
+    posts = current_user.followed_posts().paginate(page=page, per_page=app.config["POSTS_PER_PAGE"],error_out=False)
+    # posts = Post.query.order_by(Post.timestamp.desc()).paginate(
+    # page=page, per_page=app.config['POSTS_PER_PAGE'], error_out=False)
+
+    next_url = url_for('index', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('index', page=posts.prev_num) if posts.has_prev else None
+    
     # ↓ この return の「位置（左側の空白の数）」が上の user= と同じことが重要です！
-    return render_template('index.html', title='ホーム', user=user, posts=posts)
+    return render_template('index.html', title='ホーム', posts=posts.items,next_url=next_url,prev_url=prev_url)#paginate() を使うと、データそのものだけでなく「次のページはあるか？」「全部で何ページあるか？」という便利な情報が詰まったオブジェクトが返ってきます。
 
 @app.route('/login', methods=["GET","POST"])
 def login():

@@ -1,13 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>こんにちは, {{ user.username }}さん！</h1>
-    {# <p>あなたの好きな食べ物は{{ user.favorite_food }}ですね。</p> #}
+    <h1>こんにちは, {{ current_user.username }}さん！</h1>
+    
     
     {% for post in posts %}
-    <div>
+    <div style="border-bottom:1px dotted #ccc; margin-bottom: 10px;">
         <p><b>{{post.author.username}}</b>:{{post.body}}</p>
     </div>
     <hr>
     {% endfor %}
+    <br>
+    {% if prev_url %}
+    <a href="{{ prev_url }}">←新しい投稿へ</a>
+    {% endif %}
+    {% if next_url %}
+    <a href="{{ next_url }}">古い投稿へ→</a>
+    {% endif %}
 {% endblock %}
