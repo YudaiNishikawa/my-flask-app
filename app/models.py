@@ -3,7 +3,10 @@ from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import UserMixin
 from hashlib import md5
 from datetime import datetime,timezone
-from datetime import datetime,timezone
+from flask import current_app #circular import を防ぐため
+import jwt
+from time import time
+import app
 
 followers=db.Table("followers",
     db.Column("follower_id",db.Integer,db.ForeignKey("user.id")),
@@ -65,6 +68,21 @@ class User(UserMixin,db.Model):
         own = Post.query.filter_by(user_id=self.id)
     # unionを使って「フォロー中」と「自分」を合体させる
         return followed.union(own).order_by(Post.timestamp.desc())
+    
+    def get_reset_password_token(self,expires_in=600):
+        # 10分間（600秒）だけ有効な「合言葉」を作成
+        return jwt.encode(
+            {"reset_password":self.id, "exp":time()+expires_in},
+            current_app.config["SECRET_KEY"],algorithm="HS256")
+    
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id=jwt.decode(token,current_app.config["SECRET_KEY"],
+                          algorithms=["HS256"])["reset_password"]
+        except:
+            return None
+        return User.query.get(id)
     
     
 @login.user_loader

@@ -30,3 +30,13 @@ class EditProfileForm(FlaskForm):
     username=StringField("ユーザー名",validators=[DataRequired()])
     about_me=TextAreaField("自己紹介",validators=[Length(min=0,max=140)])
     submit=SubmitField("保存")
+
+class PasswordResetRequestForm(FlaskForm):
+    email=StringField("Email",validators=[DataRequired(),Email()])
+    submit=SubmitField("Request Password Reset")
+
+class ResetPasswordForm(FlaskForm):
+    password=PasswordField("Password",validators=[DataRequired()])
+    password2 = PasswordField(
+        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Reset Password')

@@ -1,0 +1,30 @@
+2026-02-02 19:17:44,445 INFO: Microblog startup [in C:\Users\yudai\Desktop\microblog\app\__init__.py:45]
+2026-02-06 23:05:31,527 INFO: Microblog startup [in C:\Users\yudai\Desktop\microblog\app\__init__.py:45]
+2026-02-06 23:19:31,922 INFO: Microblog startup [in C:\Users\yudai\Desktop\microblog\app\__init__.py:45]
+2026-02-06 23:22:18,041 INFO: Microblog startup [in C:\Users\yudai\Desktop\microblog\app\__init__.py:45]
+2026-02-06 23:22:33,672 ERROR: Exception on /reset_password_request [POST] [in C:\Users\yudai\Desktop\microblog\venv\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\yudai\Desktop\microblog\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\yudai\Desktop\microblog\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\yudai\Desktop\microblog\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\yudai\Desktop\microblog\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\yudai\Desktop\microblog\app\routes.py", line 140, in reset_password_request
+    send_password_reset_email(user)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\yudai\Desktop\microblog\app\email.py", line 21, in send_password_reset_email
+    token=user.get_reset_password_token()
+  File "C:\Users\yudai\Desktop\microblog\app\models.py", line 74, in get_reset_password_token
+    return jwt.encode(
+           ~~~~~~~~~~^
+        {"reset_password":self.id, "exp":time()+expires_in},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        current_app.config["SECRET_KEY"],algorithms="HS256")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: PyJWT.encode() got an unexpected keyword argument 'algorithms'. Did you mean 'algorithm'?
+2026-02-06 23:24:03,178 INFO: Microblog startup [in C:\Users\yudai\Desktop\microblog\app\__init__.py:45]
+2026-02-06 23:28:03,576 INFO: Microblog startup [in C:\Users\yudai\Desktop\microblog\app\__init__.py:45]
