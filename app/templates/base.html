@@ -1,33 +1,89 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        {% if title %}
-        <title>{{title}} - Microblog</title>
-        {% else %}
-        <title>Welcome to Microblog</title>
-        {% endif %} 
-    </head>
-    <body>
-        <div>
-            Microblog:
-            <a href="{{ url_for('index') }}">ホーム</a>
-            {% if current_user.is_anonymous %}
-                <a href="{{url_for('login')}}">ログイン</a>
-            {% else %}
-            <a href="{{ url_for('logout') }}">ログアウト</a>
-            {% endif %}
-        </div>
-        <hr>
-        {% with messages=get_flashed_messages() %}
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
+{% extends "bootstrap5/base.html" %}
+
+{% block title %}
+    {% if title %}{{ title }}-Microblog{% else %}Welcome to Microblog{% endif %}
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
+            </li>
         </ul>
-        {% endif %}
-        {% endwith %}
-        {#ここに各ページの中身が流し込まれます#}
-        {% block content %}{% endblock %}
-    </body>
-</html>
+        <ul class="navbar-nav mb-2 mb-lg-0">
+            {% if current_user.is_anonymous %}
+                {# ログインしていない時は「Login」を表示 #}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                </li>
+            {% else %}
+                {# ログインしている時だけ「Profile」と「Messages」を表示 #}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.user', username=current_user.username) }}">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.messages') }}">
+                        {{ _("Messages") }}
+                        {# ここで unread_count を計算 #}
+                        {% set unread_count = current_user.new_messages() %}
+                        <span id="message_count" class="badge text-bg-danger {{ 'd-none' if not unread_count }}">
+                            {{ unread_count }}
+                        </span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {% with messages = get_flashed_messages() %} {# standardizing of flash-messages #} {# withを使うとendwithがでるまで一時的に変数を代入することができる #}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-info" role="alert">{{ message }}</div> {# role="alert" is for using screen reader #}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {# The main contents of each pages are included here #}
+    {% block app_content %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {% if current_user.is_authenticated %}
+    <script>
+        $(function(){
+            let since=0;
+            const check_notification=()=>{
+                $.ajax("{{ url_for('main.notifications') }}?since="+since).done(
+                    function(notifications){
+                        for (let i =0; i<notifications.length; i++){
+                            if (notifications[i].name== "unread_message_count"){
+                                set_message_count(notifications[i].data);
+                            }
+                            since=notifications[i].timestamp;
+                        }
+                    }
+                );
+            };
+
+            const set_message_count=(n)=>{
+                console.log("Current unread count:", n)
+                $("#message_count").text(n);
+                $("#message_count").css("visibility",n>0 ? "visible" : "hidden");
+            };
+            check_notification();
+            setInterval(check_notification,10000);
+        });
+    </script>
+    {% endif %}
+{% endblock %}

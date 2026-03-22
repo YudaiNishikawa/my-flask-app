@@ -17,5 +17,8 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['your-email@example.com']
-
     POSTS_PER_PAGE=3
+    LANGUAGES=["en","ja"]
+    MS_TRANSLATOR_KEY = os.environ.get('MS_TRANSLATOR_KEY')
+    TRANSRATE_KEY=os.environ.get("GOOGLE_TRANSLATE_API_KEY")
+    REDIS_URL=os.environ.get("REDIS_URL") or "radis://localhost:6379"

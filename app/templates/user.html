@@ -11,10 +11,10 @@
     <hr>
     {% if user != current_user %} {# 自分をフォローしないように #}
         {% if not current_user.is_following(user) %}
-            <p><a href="{{ url_for('follow', username=user.username)}}">フォローする</a></p>
+            <p><a href="{{ url_for('main.follow', username=user.username)}}">フォローする</a></p>
         
         {% else %}
-            <a href="{{ url_for('unfollow', username=user.username) }}">フォロー解除</a>
+            <a href="{{ url_for('main.unfollow', username=user.username) }}">フォロー解除</a>
         {% endif %}
     {% endif %}
     {% for post in posts %}
@@ -24,15 +24,23 @@
     {% endfor %}
     <h1>ユーザー：{{ user.username  }}</h1>
     {% if user.about_me %}<P>{{ user.about_me }}</P>{% endif %}
-    {% if user.last_seen %}<P>最終ログイン:{{ user.last_seen }}</P>{% endif %}
+    {% if user.last_seen %}<P>最終ログイン:{{ moment(user.last_seen).fromNow() }}</P>{% endif %}
 
     {% if user == current_user %}
-    <p><a href="{{ url_for('edit_profile') }}">プロフィールを編集する</a></p>
+    <p><a href="{{ url_for('main.edit_profile') }}">プロフィールを編集する</a></p>
     {% endif %}
     <hr>
     {% for post in posts %}
         {% include '_post.html' %}
     {% endfor %}
+
+    {% if user != current_user %}
+    <p>
+        <a class="btn btn-secondary" href="{{ url_for('main.send_message', recipient=user.username) }}">
+            {{ _("Send private message") }}
+        </a>
+    </p>
+    {% endif %}
 {% endblock %}
     
     

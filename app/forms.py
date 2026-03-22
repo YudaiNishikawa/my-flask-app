@@ -2,9 +2,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField,TextAreaField
 from wtforms.validators import DataRequired,Email,EqualTo,ValidationError,Length
 from app.models import User
+from flask_babel import lazy_gettext as _l
 
 class LoginForm(FlaskForm):
-    username=StringField("ユーザー名",validators=[DataRequired()])
+    username=StringField(_l("ユーザー名"),validators=[DataRequired()])
     password=PasswordField("パスワード",validators=[DataRequired()])
     remember_me=BooleanField("ログイン状態を保持する")
     submit=SubmitField("サインイン")
@@ -40,3 +41,7 @@ class ResetPasswordForm(FlaskForm):
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+
+class MessageForm(FlaskForm):
+    body=TextAreaField("message",validators=[DataRequired(),Length(min=0,max=140)])
+    submit=SubmitField("送信")
